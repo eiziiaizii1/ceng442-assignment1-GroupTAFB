@@ -65,7 +65,7 @@ Bu projenin (ve `Notebook_...ipynb` dosyasının) çalıştırılabilmesi için 
     ```
 4.  (Eğer Jupyter kullanıyorsanız) Sanal ortamı Jupyter'e tanıtın:
     ```bash
-    python -m ipykernel install --user --name=ceng442-venv
+    python -m ipykernel install --user --name=venv
     ```
 5.  Jupyter Notebook'u başlatın ve `Kernel > Change kernel` menüsünden `ceng442-venv` seçeneğini seçin.
     ```bash
