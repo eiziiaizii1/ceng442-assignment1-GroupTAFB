@@ -85,7 +85,10 @@ Eğer model eğitimini (2. Aşama) Google Colab üzerinde yapmak isterseniz, Col
 %cd ceng442-assignment1-GroupTAFB
 
 # 3. Gerekli kütüphaneleri kur
-!pip install -r requirements.txt
+# DON'T DO THIS LINE WILL TRY TO CHANGE UNDERLYING LIBRARIES THAT RUNS THE COLAB ITSELF
+# Instead you may intall libraries required like emoji, etc. individually
+#!pip install -r requirements.txt
+
 
 # 4. Artık 'clean_data/' klasöründeki dosyaları okuyabilir
 #    ve 'ozel_temizlik.py' dosyasını import edebilirsiniz.
