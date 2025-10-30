@@ -8,6 +8,8 @@
 * Buğra Bildiren | 20050111022
 
 ---
+## Embeddings
+https://drive.google.com/drive/folders/1JDyQ9jVjnsINwnwt0GCWzyrAAb633duM?usp=sharing
 
 ## Proje Durumu ve Sonraki Adımlar
 Bu belge, projenin mevcut durumunu ve bir sonraki aşamaya (Model Eğitimi) geçecek ekip üyeleri için talimatları içerir.
@@ -46,7 +48,7 @@ Bu projenin (ve `Notebook_...ipynb` dosyasının) çalıştırılabilmesi için 
 
 1.  Projeyi klonlayın:
     ```bash
-    git clone [https://github.com/GroupTAFB/ceng442-assignment1-GroupTAFB.git](https://github.com/GroupTAFB/ceng442-assignment1-GroupTAFB.git)
+    git clone https://github.com/eiziiaizii1/ceng442-assignment1-GroupTAFB.git
     cd ceng442-assignment1-GroupTAFB
     ```
 2.  Bir sanal ortam (virtual environment) oluşturun ve aktive edin:
@@ -74,23 +76,11 @@ Bu projenin (ve `Notebook_...ipynb` dosyasının) çalıştırılabilmesi için 
 
 ---
 
-## Google Colab için Kurulum
-Eğer model eğitimini (2. Aşama) Google Colab üzerinde yapmak isterseniz, Colab notebook'unuzdaki **ilk hücrede** şu komutları çalıştırmanız yeterlidir:
-
+## Installation for Google Colab 
+If you want to train model in Google Colab, Dont forget to run this codes in the first cell
 ```python
-# 1. Projeyi (içindeki clean_data/ ve ozel_temizlik.py dahil) klonla
 !git clone https://github.com/eiziiaizii1/ceng442-assignment1-GroupTAFB.git
-
-# 2. Proje klasörüne gir
 %cd ceng442-assignment1-GroupTAFB
-
-# 3. Gerekli kütüphaneleri kur
-# DON'T DO THIS LINE WILL TRY TO CHANGE UNDERLYING LIBRARIES THAT RUNS THE COLAB ITSELF
-# Instead you may intall libraries required like emoji, etc. individually
+# DON'T RUN THIS LINE, THIS WILL TRY TO CHANGE UNDERLYING LIBRARIES THAT RUNS THE COLAB ITSELF
 #!pip install -r requirements.txt
 
-
-# 4. Artık 'clean_data/' klasöründeki dosyaları okuyabilir
-#    ve 'ozel_temizlik.py' dosyasını import edebilirsiniz.
-# import ozel_temizlik
-# pd.read_excel("clean_data/test_1_2col.xlsx")
