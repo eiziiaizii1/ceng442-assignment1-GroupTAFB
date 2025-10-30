@@ -79,7 +79,7 @@ Eğer model eğitimini (2. Aşama) Google Colab üzerinde yapmak isterseniz, Col
 
 ```python
 # 1. Projeyi (içindeki clean_data/ ve ozel_temizlik.py dahil) klonla
-!git clone [https://github.com/GroupTAFB/ceng442-assignment1-GroupTAFB.git](https://github.com/GroupTAFB/ceng442-assignment1-GroupTAFB.git)
+!git clone https://github.com/eiziiaizii1/ceng442-assignment1-GroupTAFB.git
 
 # 2. Proje klasörüne gir
 %cd ceng442-assignment1-GroupTAFB
