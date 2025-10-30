@@ -1,5 +1,6 @@
-# ceng442-assignment1-GroupTAFB
-## CENG442 Assignment 1 - Azerbaijani Text Preprocessing & Word Embeddings
+# CENG442 Assignment 1: Azerbaijani Text Processing & Word Embeddings
+
+This project is a pipeline for preprocessing Azerbaijani text data and training Word2Vec and FastText models for sentiment analysis.
 
 **Group Members:**
 * Talha Ubeydullah Gamga | 20050111078
@@ -8,79 +9,123 @@
 * Buğra Bildiren | 20050111022
 
 ---
-## Embeddings
-https://drive.google.com/drive/folders/1JDyQ9jVjnsINwnwt0GCWzyrAAb633duM?usp=sharing
 
-## Proje Durumu ve Sonraki Adımlar
-Bu belge, projenin mevcut durumunu ve bir sonraki aşamaya (Model Eğitimi) geçecek ekip üyeleri için talimatları içerir.
+## Project Overview
 
-### 1. Aşama: Veri Ön İşleme (Data Preprocessing) - TAMAMLANDI
-Bu aşama (Kişi 1 ve Kişi 2'nin sorumluluğu) başarıyla tamamlanmıştır.
+The main script (`Notebook_ceng442_assignment1_GroupTAFB.ipynb`) performs a complete NLP pipeline:
 
-**Neler Yapıldı?** Ödev PDF'inde (`CENG442_Assignment1_.pdf`) belirtilen 5 adet ham `.xlsx` veri seti (`data/` klasöründe) okundu ve aşağıdaki işlemlerden geçirildi:
+1.  **Data Loading:** Reads raw Excel files from the `data/` directory.
+2.  **Preprocessing:** Applies a series of advanced cleaning and normalization steps.
+3.  **File Output:** Saves the cleaned, standardized data (as `cleaned_text`, `sentiment_value`) into the `clean_data/` folder.
+4.  **Corpus Building:** Combines all cleaned text into a single `corpus_all.txt` file for training.
+5.  **Model Training:** Trains Word2Vec and FastText models (vector size 300, window 5, skip-gram) on the corpus.
+6.  **Model Saving:** Saves the trained models to the `embeddings/` folder.
+7.  **Evaluation:** Compares the Word2Vec and FastText models on quantitative and qualitative metrics.
 
-* **Temel Temizlik:** Azerbaycancaya özel küçük harf dönüşümü (İ→i, I→ı), HTML etiketleri, URL, E-posta ve Sayı (`<NUM>`) temizliği yapıldı.
-* **Özel Temizlik (`ozel_temizlik.py` kullanılarak):**
-    * Metinler "news", "social", "reviews", "general" olarak etiketlendi.
-    * "Reviews" alanı için Fiyat (`<PRICE>`) ve Puan (`<STARS_HIGH>`) etiketlemesi yapıldı.
-    * Emojiler (`EMO_POS`, `EMO_NEG`) haritalandı.
-    * Hashtag'ler (`#QarabagIsBack` → `qarabag is back`) ayrıştırıldı.
-    * Olumsuzluk ekleri (`yox`, `deyil` vb.) `_NEG` ile etiketlendi.
-* **Etiket Standardizasyonu:** 5 farklı dosyadaki tüm duygu etiketleri (Positive, negative, 0, 1, 0.5 vb.) standart `float` (0.0, 0.5, 1.0) formatına dönüştürüldü.
-* **Çıktı (Deliverable #1):** Bu işlemler sonucunda, ödevin 1. teslimatı olan 5 adet temizlenmiş, iki sütunlu (`cleaned_text`, `sentiment_value`) Excel dosyası üretildi ve `clean_data/` klasörüne kaydedildi.
+## Key Features
 
-Bu sürecin tamamı `Notebook_ceng442_assignment1_GroupTAFB.ipynb` dosyasında adım adım görülebilir.
-
-### 2. Aşama: Model Eğitimi (Word2Vec/FastText) - HAZIR
-Proje, 2. aşama olan model eğitimine (Kişi 3'ün görevi) hazırdır.
-
-**Yapılması Gerekenler (Sonraki Adımlar):** Bir sonraki arkadaşımızın bu noktadan devam etmesi için yapması gerekenler:
-
-1.  **`clean_data/` Klasörünü Kullanmak:** Model eğitimi için kaynak olarak `data/` klasöründeki ham verileri *kullanmayın*. Eğitim için `clean_data/` klasöründeki 5 adet temizlenmiş `..._2col.xlsx` dosyasını okumanız gerekmektedir.
-2.  **Corpus (Deliverable #2) Oluşturma:** Bu 5 temiz dosyayı okuyun ve PDF'teki (Bölüm 7.2 - `build_corpus_txt`) iskeleti kullanarak `corpus_all.txt` dosyasını oluşturun. (Not: Bu iskelet, `ozel_temizlik.py` dosyasındaki `add_domain_tag` fonksiyonunu da kullanır.)
-3.  **Model (Deliverable #3) Eğitimi:** `corpus_all.txt` dosyasını kullanarak Word2Vec ve FastText modellerini (PDF Bölüm 8) eğitin ve `embeddings/` klasörüne kaydedin.
-4.  **Değerlendirme:** Modelleri PDF'teki (Bölüm 9) metriklere göre (Kapsam, Benzerlik, En Yakın Komşular) karşılaştırın.
+* **Azerbaijani-Specific Normalization:** Correctly handles language-specific characters (e.g., `I` → `ı`, `İ` → `i`).
+* **Text Cleaning:** Removes HTML tags, URLs, emails, phone numbers, and user mentions.
+* **Domain Detection:** Identifies text domain (e.g., "reviews", "news", "social") and applies domain-specific rules.
+* **Special Tokenization:** Replaces numbers with `<NUM>`, emojis with `EMO_POS`/`EMO_NEG`, and review-specific terms with `<PRICE>` or `<RATING_POS>`.
+* **Sentiment/Negation Handling:** Appends a `_NEG` suffix to words following a negation term (e.g., `yox`, `deyil`).
+* **Slang Correction:** Normalizes common slangs (e.g., `slm` → `salam`).
 
 ---
 
-## Proje Kurulumu (Reproducibility)
-Bu projenin (ve `Notebook_...ipynb` dosyasının) çalıştırılabilmesi için gerekli adımlar:
+## Project Report & Model Evaluation
 
-1.  Projeyi klonlayın:
+After training, the Word2Vec and FastText models were evaluated on several metrics.
+
+### 1. Lexical Coverage (Quantitative)
+
+This measures the percentage of unique words from our datasets found in the model's vocabulary. FastText's ability to use subwords means it can generate vectors for any word, but this metric checks for words present in the main trained vocabulary.
+
+* `labeled-sentiment_2col.xlsx`: W2V=0.930, FT(vocab)=0.930
+* `test_1_2col.xlsx`: W2V=0.915, FT(vocab)=0.915
+* `train_3_2col.xlsx`: W2V=0.919, FT(vocab)=0.919
+* `train-00000-of-00001_2col.xlsx`: W2V=0.923, FT(vocab)=0.923
+* `merged_dataset_CSV_1_2col.xlsx`: W2V=0.899, FT(vocab)=0.899
+
+### 2. Semantic Similarity (Quantitative)
+
+We measured the cosine similarity for synonym (expected high score) and antonym (expected low score) pairs. The "Separation Score" (Synonym Sim - Antonym Sim) shows how well a model separates opposite meanings. A higher separation is better.
+
+| Metric | Word2Vec | FastText |
+| :--- | :--- | :--- |
+| **Synonym Similarity** | 0.361 | **0.465** |
+| **Antonym Similarity** | 0.335 | 0.424 |
+| **Separation Score** | 0.027 | **0.040** |
+
+**Conclusion:** FastText showed a slightly better ability to group synonyms and separate antonyms.
+
+### 3. Nearest Neighbors (Qualitative)
+
+A qualitative check shows the models' learned associations. FastText often captures morphological variations (e.g., `pis`, `pis!`, `pis.`), while Word2Vec sometimes captures related special tokens (e.g., `pis`, `<RATING_NEG>`).
+
+**Seed Word: 'yaxşı' (good)**
+* **W2V:** `['<RATING_POS>', 'yaxshi', 'iyi', 'yaxşı.', 'olar.']`
+* **FT:** `['yaxşı!', 'yaxşıı', 'yaxşı.', 'yaxşıkı', ',yaxşı']`
+
+**Seed Word: 'pis' (bad)**
+* **W2V:** `['<RATING_NEG>', '<STARS_LOW>', 'pis.', 'pisdir', 'pisdi']`
+* **FT:** `['pis!', 'pis,', 'pis.', 'pis.pul', 'piis']`
+
+**Seed Word: 'bahalı' (expensive)**
+* **W2V:** `['portretlerinə', 'villaları', 'yaxtaları', 'şəbəkədi', 'metallarla']`
+* **FT:** `['bahalıı', 'bahalısı', 'bahalıq', 'baharlı', 'baha,']`
+
+---
+
+## How to Run
+
+There are two options to run the full pipeline.
+
+### Option 1: Google Colab (Recommended)
+
+This is the simplest way to run the project without any local setup.
+
+1.  Open the notebook in Google Colab.
+2.  Run the **first code cell** in the notebook. This cell will clone the repository, change the directory, and install the necessary Python packages (`pandas`, `gensim`, etc.).
+
+    ```python
+    !git clone [https://github.com/eiziiaizii1/ceng442-assignment1-GroupTAFB.git](https://github.com/eiziiaizii1/ceng442-assignment1-GroupTAFB.git)
+    %cd ceng442-assignment1-GroupTAFB
+    !pip install pandas gensim openpyxl regex ftfy scikit-learn
+    ```
+3.  Run all subsequent cells in the notebook to perform data processing, model training, and evaluation.
+
+### Option 2: Running Locally
+
+This option requires you to set up a local Python environment.
+
+1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/eiziiaizii1/ceng442-assignment1-GroupTAFB.git
+    git clone [https://github.com/eiziiaizii1/ceng442-assignment1-GroupTAFB.git](https://github.com/eiziiaizii1/ceng442-assignment1-GroupTAFB.git)
     cd ceng442-assignment1-GroupTAFB
     ```
-2.  Bir sanal ortam (virtual environment) oluşturun ve aktive edin:
-    ```bash
-    # Windows
-    python -m venv venv
-    .\venv\Scripts\activate
-    
-    # macOS/Linux
-    python3 -m venv venv
-    source venv/bin/activate
-    ```
-3.  Gerekli tüm bağımlılıkları (`requirements.txt` dosyasından) yükleyin:
+
+2.  **Create and activate a virtual environment:**
+
+    * On macOS/Linux:
+        ```bash
+        python3 -m venv venv
+        source venv/bin/activate
+        ```
+    * On Windows:
+        ```bash
+        python -m venv venv
+        .\venv\Scripts\activate
+        ```
+
+3.  **Install the required packages:**
     ```bash
     pip install -r requirements.txt
     ```
-4.  (Eğer Jupyter kullanıyorsanız) Sanal ortamı Jupyter'e tanıtın:
-    ```bash
-    python -m ipykernel install --user --name=venv
-    ```
-5.  Jupyter Notebook'u başlatın ve `Kernel > Change kernel` menüsünden `ceng442-venv` seçeneğini seçin.
+
+4.  **Run the notebook:**
+    Start Jupyter Notebook and open `Notebook_ceng442_assignment1_GroupTAFB.ipynb`.
     ```bash
     jupyter notebook
     ```
-
----
-
-## Installation for Google Colab 
-If you want to train model in Google Colab, Dont forget to run this codes in the first cell
-```python
-!git clone https://github.com/eiziiaizii1/ceng442-assignment1-GroupTAFB.git
-%cd ceng442-assignment1-GroupTAFB
-# DON'T RUN THIS LINE, THIS WILL TRY TO CHANGE UNDERLYING LIBRARIES THAT RUNS THE COLAB ITSELF
-#!pip install -r requirements.txt
-
+    Then, run all cells in the notebook.
