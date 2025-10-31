@@ -75,27 +75,24 @@ We implemented several of the mini-challenges from the assignment description:
 * **Emoji Mapping:** Implemented with a small dictionary for common positive and negative emojis (see Section 2).
 * **Negation Scope (Toggle):** Implemented in our main pipeline. We marked the 3 tokens following a negator with a `_NEG` suffix.
 * **Simple Deasciify:** Implemented as part of our `SLANG_MAP`, which corrects `cox` -> `çox` and `yaxsi` -> `yaxşı`.
-* **Stopword Research:**
-## Stopword Research
+* **Stopword Research:**  
+    We compared Azerbaijani (AZ) stopwords with English (EN) stopwords, as they are related languages. We noticed that many common function words, like conjunctions and pronouns, are very similar.  
 
-We compared Azerbaijani (AZ) stopwords with English (EN) stopwords, as they are related languages. We noticed that many common function words, like conjunctions and pronouns, are very similar.
+    Based on our analysis, we proposed 10 candidate stopwords for removal, which are common and do not carry strong sentiment:
 
-Based on our analysis, we proposed 10 candidate stopwords for removal, which are common and do not carry strong sentiment:
+    - və (and)  
+    - ilə (with)  
+    - amma (but)  
+    - ancaq (but/only)  
+    - lakin (but)  
+    - ya (or)  
+    - həm (also)  
+    - ki (that)  
+    - bu (this)  
+    - bir (a/an/one)
 
-- və (and)  
-- ilə (with)  
-- amma (but)  
-- ancaq (but/only)  
-- lakin (but)  
-- ya (or)  
-- həm (also)  
-- ki (that)  
-- bu (this)  
-- bir (a/an/one)
-
-**Why we did not remove negations:**  
-We did not remove negation words like *yox* (no/not), *deyil* (is not), or *heç* (not at all). This is because these words are critical for sentiment analysis.
-
+    **Why we did not remove negations:**  
+    We did not remove negation words like *yox* (no/not), *deyil* (is not), or *heç* (not at all). This is because these words are critical for sentiment analysis.
 
 ## 4. Domain-Aware Processing
 
