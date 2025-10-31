@@ -59,7 +59,13 @@ Before processing, we cleaned the datasets by:
 
 **Before/After Examples:**
 
-`[LÜTFEN DOLDURUN: Buraya, işlenmemiş bir metin (before) ve yukarıdaki kurallarla temizlenmiş halini (after) gösteren 1-2 örnek ekleyin. Örnek: "Before: @user <p>Men bu filme #BaxmagaDeyer 10 AZN verdim cox gozel idi!!! 🙂" -> "After: USER men bu filme baxmaga deyer <NUM> manat verdim çox gözel idi EMO_POS"]`
+--- Example 1 ---
+Before: @user <p>Men bu filme #BaxmagaDeyer 10 AZN verdim cox gozel idi!!! 🙂
+After: user men bu filme baxmaga deyer <NUM> azn verdim çox gozel idi emo pos
+
+--- Example 2 ---
+Before: Bu telefon heç yaxsi deyil, batareyasi çabuk bitiyor.😡
+After: bu telefon heç yaxşı_NEG deyil batareyasi_NEG çabuk_NEG bitiyor_NEG emo neg
 
 ## 3. Mini Challenges
 
@@ -70,7 +76,26 @@ We implemented several of the mini-challenges from the assignment description:
 * **Negation Scope (Toggle):** Implemented in our main pipeline. We marked the 3 tokens following a negator with a `_NEG` suffix.
 * **Simple Deasciify:** Implemented as part of our `SLANG_MAP`, which corrects `cox` -> `çox` and `yaxsi` -> `yaxşı`.
 * **Stopword Research:**
-    `[LÜTFEN DOLDURUN: Bu bölümde Azerice (AZ) ile başka bir dili (TR/EN/RU) karşılaştıran stopword araştırmanızın gözlemlerini ekleyin. Ödevde istendiği gibi 10 aday stopword listesi önerin ve neden olumsuzluk eklerini (yox, deyil) çıkarmadığınızı belirtin.]`
+## Stopword Research
+
+We compared Azerbaijani (AZ) stopwords with English (EN) stopwords, as they are related languages. We noticed that many common function words, like conjunctions and pronouns, are very similar.
+
+Based on our analysis, we proposed 10 candidate stopwords for removal, which are common and do not carry strong sentiment:
+
+- və (and)  
+- ilə (with)  
+- amma (but)  
+- ancaq (but/only)  
+- lakin (but)  
+- ya (or)  
+- həm (also)  
+- ki (that)  
+- bu (this)  
+- bir (a/an/one)
+
+**Why we did not remove negations:**  
+We did not remove negation words like *yox* (no/not), *deyil* (is not), or *heç* (not at all). This is because these words are critical for sentiment analysis.
+
 
 ## 4. Domain-Aware Processing
 
