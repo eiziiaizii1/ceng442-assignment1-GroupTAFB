@@ -165,7 +165,31 @@ We measured cosine similarity for synonym (higher is better) and antonym (lower 
 **Domain Drift Analysis:**
 We also conducted a domain drift analysis (see Notebook Cell 27) to see if word meanings changed between the "reviews" and "general" domains. We trained separate models on *balanced* samples (5,145 sentences each) and found that words like `telefon` ($0.529$ drift) and `yaxşı` ($0.477$ drift) showed a noticeable change in context, while `film` ($0.264$ drift) remained stable.
 
-## 6. Reproducibility
+## 6. Conclusions
+
+### Model Comparison
+
+Both Word2Vec and FastText achieved similar **lexical coverage** (93-99% across datasets), indicating that our preprocessing pipeline successfully standardized the vocabulary. However, the models showed distinct characteristics:
+
+**Word2Vec** demonstrated slightly better semantic discrimination with a separation score of **0.029** compared to FastText's **0.015**. This suggests Word2Vec better distinguishes between synonyms and antonyms in our Azerbaijani sentiment corpus. The nearest neighbor analysis revealed that Word2Vec captures more contextually meaningful relationships (e.g., `<RATING_POS>` neighbors include sentiment-related words like 'süper', 'öyrədici').
+
+**FastText**, while showing lower separation scores, excelled at handling morphological variations - its neighbors for seed words often included inflected forms (e.g., `bahalı` → `bahalısı`, `bahalıq`). This is particularly valuable for Azerbaijani, an agglutinative language with rich morphology.
+
+### Why Word2Vec Performed Better
+
+For our specific **sentiment analysis** task, Word2Vec's stronger semantic separation makes it the preferred choice. The ability to clearly distinguish positive from negative sentiment is more critical than handling rare word forms, especially since our preprocessing (deasciification, slang correction) already normalized most common variations.
+
+### Next Steps
+
+1. **Expand domain coverage**: Our dataset was heavily skewed toward "general" (118,950 sentences) versus "reviews" (5,145 sentences). Collecting more balanced domain-specific data would improve domain-aware embeddings.
+
+2. **Implement lemmatization**: Adding morphological analysis could reduce vocabulary size and improve generalization, particularly beneficial for FastText.
+
+3. **Fine-tune for sentiment**: Train domain-specific models or use the embeddings as input to a downstream sentiment classifier (e.g., LSTM, BERT-style transformer) to evaluate their practical impact.
+
+4. **Explore contextualized embeddings**: Modern approaches like multilingual BERT or language-specific transformers might capture sentiment nuances better than static embeddings.
+
+## 7. Reproducibility
 
 ### Option 1: Google Colab (Recommended)
 
