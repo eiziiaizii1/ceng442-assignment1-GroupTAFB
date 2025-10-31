@@ -71,8 +71,8 @@ After: bu telefon heç yaxşı_NEG deyil batareyasi_NEG çabuk_NEG bitiyor_NEG e
 
 We implemented several of the mini-challenges from the assignment description:
 
-* **Hashtag Split:** Implemented as part of the main preprocessing pipeline (see Section 2).
-* **Emoji Mapping:** Implemented with a small dictionary for common positive and negative emojis (see Section 2).
+* **Hashtag Split:** Implemented as part of the main preprocessing pipeline.
+* **Emoji Mapping:** Implemented with a small dictionary for common positive and negative emojis.
 * **Negation Scope (Toggle):** Implemented in our main pipeline. We marked the 3 tokens following a negator with a `_NEG` suffix.
 * **Simple Deasciify:** Implemented as part of our `SLANG_MAP`, which corrects `cox` -> `çox` and `yaxsi` -> `yaxşı`.
 * **Stopword Research:**  
