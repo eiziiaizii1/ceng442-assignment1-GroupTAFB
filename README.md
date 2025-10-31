@@ -24,64 +24,130 @@ The main script (`Notebook_ceng442_assignment1_GroupTAFB.ipynb`) performs a comp
 6.  **Model Saving:** Saves the trained models to the `embeddings/` folder.
 7.  **Evaluation:** Compares the Word2Vec and FastText models on quantitative and qualitative metrics.
 
-## Key Features
+## 1. Data & Goal
 
-* **Azerbaijani-Specific Normalization:** Correctly handles language-specific characters (e.g., `I` → `ı`, `İ` → `i`).
-* **Text Cleaning:** Removes HTML tags, URLs, emails, phone numbers, and user mentions.
-* **Domain Detection:** Identifies text domain (e.g., "reviews", "news", "social") and applies domain-specific rules.
-* **Special Tokenization:** Replaces numbers with `<NUM>`, emojis with `EMO_POS`/`EMO_NEG`, and review-specific terms with `<PRICE>` or `<RATING_POS>`.
-* **Sentiment/Negation Handling:** Appends a `_NEG` suffix to words following a negation term (e.g., `yox`, `deyil`).
-* **Slang Correction:** Normalizes common slangs (e.g., `slm` → `salam`).
+**Datasets:**
+This project uses five different Azerbaijani text datasets provided for the assignment:
+1.  `labeled-sentiment.xlsx`
+2.  `merged_dataset_CSV__1_.xlsx`
+3.  `test__1_.xlsx`
+4.  `train__3_.xlsx`
+5.  `train-00000-of-0001.xlsx`
 
----
+**Goal:**
+The main goal was to clean and preprocess these five datasets to create a unified corpus for sentiment analysis. As required by the assignment, we mapped all sentiment labels to a standard numeric format: **Negative (0.0)**, **Neutral (0.5)**, and **Positive (1.0)**. We kept the neutral $0.5$ value to preserve the three-class polarity, allowing models to learn the distinction between negative, positive, and explicitly neutral sentiments.
 
-## Project Report & Model Evaluation
+## 2. Preprocessing
 
-After training, the Word2Vec and FastText models were evaluated on several metrics.
+We developed a comprehensive preprocessing pipeline in the `normalize_text_az` function. This pipeline applies the following rules in order:
 
-### 1. Lexical Coverage (Quantitative)
+* **Emoji Mapping:** Converted a predefined list of positive/negative emojis to special tokens (e.g., `EMO_POS`, `EMO_NEG`).
+* **Text Cleaning:** Fixed text encoding (`ftfy`), unescaped HTML entities (`html.unescape`), and removed all HTML tags.
+* **Tokenization of Special Entities:** Replaced URLs, emails, phone numbers, and user mentions (e.g., `@username`) with special tokens (`URL`, `EMAIL`, `PHONE`, `USER`).
+* **Hashtag Splitting:** Removed the `#` symbol and split camelCase hashtags (e.g., `#QarabagIsBack` -> `qarabag is back`).
+* **Language-Specific Lowercasing:** Applied Azerbaijani-aware lowercasing, correctly handling `İ` -> `i` and `I` -> `ı`.
+* **Number & Punctuation Handling:** Replaced all digits with a `<NUM>` token and removed all punctuation (except for `.` `!` `?` when splitting sentences for the corpus).
+* **Slang/De-asciify:** Corrected common slang and "asciified" words using a map (e.g., `cox` -> `çox`, `yaxsi` -> `yaxşı`).
+* **Negation Handling:** When a negator word (like `yox`, `deyil`) was found, the next three tokens were tagged with a `_NEG` suffix (e.g., `yox yaxşı film` -> `yox yaxşı_NEG film_NEG`).
+* **Token Filtering:** Removed repeated characters (e.g., `cooool` -> `cool`) and single-letter tokens (except 'o', 'e', 'ə').
 
-This measures the percentage of unique words from our datasets found in the model's vocabulary. FastText's ability to use subwords means it can generate vectors for any word, but this metric checks for words present in the main trained vocabulary.
+**Data Removal:**
+Before processing, we cleaned the datasets by:
+1.  Dropping rows with missing text.
+2.  Dropping rows with empty (whitespace-only) text.
+3.  Dropping exact duplicates based on the text column.
 
-* `labeled-sentiment_2col.xlsx`: W2V=0.930, FT(vocab)=0.930
-* `test_1_2col.xlsx`: W2V=0.915, FT(vocab)=0.915
-* `train_3_2col.xlsx`: W2V=0.919, FT(vocab)=0.919
-* `train-00000-of-00001_2col.xlsx`: W2V=0.923, FT(vocab)=0.923
-* `merged_dataset_CSV_1_2col.xlsx`: W2V=0.899, FT(vocab)=0.899
+**Before/After Examples:**
 
-### 2. Semantic Similarity (Quantitative)
+`[LÜTFEN DOLDURUN: Buraya, işlenmemiş bir metin (before) ve yukarıdaki kurallarla temizlenmiş halini (after) gösteren 1-2 örnek ekleyin. Örnek: "Before: @user <p>Men bu filme #BaxmagaDeyer 10 AZN verdim cox gozel idi!!! 🙂" -> "After: USER men bu filme baxmaga deyer <NUM> manat verdim çox gözel idi EMO_POS"]`
 
-We measured the cosine similarity for synonym (expected high score) and antonym (expected low score) pairs. The "Separation Score" (Synonym Sim - Antonym Sim) shows how well a model separates opposite meanings. A higher separation is better.
+## 3. Mini Challenges
 
-| Metric | Word2Vec | FastText |
+We implemented several of the mini-challenges from the assignment description:
+
+* **Hashtag Split:** Implemented as part of the main preprocessing pipeline (see Section 2).
+* **Emoji Mapping:** Implemented with a small dictionary for common positive and negative emojis (see Section 2).
+* **Negation Scope (Toggle):** Implemented in our main pipeline. We marked the 3 tokens following a negator with a `_NEG` suffix.
+* **Simple Deasciify:** Implemented as part of our `SLANG_MAP`, which corrects `cox` -> `çox` and `yaxsi` -> `yaxşı`.
+* **Stopword Research:**
+    `[LÜTFEN DOLDURUN: Bu bölümde Azerice (AZ) ile başka bir dili (TR/EN/RU) karşılaştıran stopword araştırmanızın gözlemlerini ekleyin. Ödevde istendiği gibi 10 aday stopword listesi önerin ve neden olumsuzluk eklerini (yox, deyil) çıkarmadığınızı belirtin.]`
+
+## 4. Domain-Aware Processing
+
+We implemented a simple domain-aware system as required.
+
+**1. Detection Rules:**
+We used regex to detect domains based on keywords:
+* `news`: `apa`, `trend`, `azertac`, `reuters`, `bloomberg`, etc.
+* `social`: `rt`, `@`, `#`, or common emojis.
+* `reviews`: `azn`, `manat`, `qiymət`, `aldım`, `ulduz`, `çox yaxşı`, `çox pis`.
+* `general`: Any text not matching the above.
+
+**2. Domain-Specific Normalization:**
+After the main cleaning, we applied a special function (`domain_specific_normalize`) *only* for texts detected as "reviews". This function replaced:
+* Prices (e.g., `10 azn`) with a `<PRICE>` token.
+* Star ratings (e.g., `5 ulduz`) with `<STARS_5>` token.
+* Specific phrases (e.g., `çox yaxşı`) with `<RATING_POS>` or `<RATING_NEG>` tokens.
+
+**3. Domain Tagging:**
+For the final `corpus_all.txt`, we added a domain tag (e.g., `domnews`, `domreviews`) to the beginning of every line, as generated by the `detect_domain` function.
+
+## 5. Embeddings
+
+We trained Word2Vec (W2V) and FastText (FT) models on the combined `corpus_all.txt`.
+
+**Training Settings:**
+
+| Parameter | Word2Vec (gensim) | FastText (gensim) |
 | :--- | :--- | :--- |
-| **Synonym Similarity** | 0.361 | **0.465** |
-| **Antonym Similarity** | 0.335 | 0.424 |
-| **Separation Score** | 0.027 | **0.040** |
+| `vector_size` | 300 | 300 |
+| `window` | 5 | 5 |
+| `min_count` | 3 | 3 |
+| `sg` (model) | 1 (Skip-gram) | 1 (Skip-gram) |
+| `epochs` | 10 | 10 |
+| `negative` | 10 | (N/A) |
+| `min_n` (char n-gram) | (N/A) | 3 |
+| `max_n` (char n-gram) | (N/A) | 6 |
 
-**Conclusion:** FastText showed a slightly better ability to group synonyms and separate antonyms.
+**Results: Lexical Coverage (In-Vocabulary)**
+This measures how many tokens from each dataset were found in the model's vocabulary.
 
-### 3. Nearest Neighbors (Qualitative)
+| Dataset | W2V Coverage | FT Coverage |
+| :--- | :--- | :--- |
+| labeled-sentiment | 0.932 | 0.932 |
+| test__1_ | 0.987 | 0.987 |
+| train__3_ | 0.990 | 0.990 |
+| train-00000-of-00001 | 0.943 | 0.943 |
+| merged_dataset_CSV__1_ | 0.949 | 0.949 |
 
-A qualitative check shows the models' learned associations. FastText often captures morphological variations (e.g., `pis`, `pis!`, `pis.`), while Word2Vec sometimes captures related special tokens (e.g., `pis`, `<RATING_NEG>`).
+**Results: Semantic Similarity**
+We measured cosine similarity for synonym (higher is better) and antonym (lower is better) pairs.
 
-**Seed Word: 'yaxşı' (good)**
-* **W2V:** `['<RATING_POS>', 'yaxshi', 'iyi', 'yaxşı.', 'olar.']`
-* **FT:** `['yaxşı!', 'yaxşıı', 'yaxşı.', 'yaxşıkı', ',yaxşı']`
+| Metric | Word2Vex (W2V) | FastText (FT) |
+| :--- | :--- | :--- |
+| Synonyms (avg. similarity) | 0.365 | 0.439 |
+| Antonyms (avg. similarity) | 0.336 | 0.424 |
+| **Separation (Syn - Ant)** | **0.029** | **0.015** |
 
-**Seed Word: 'pis' (bad)**
-* **W2V:** `['<RATING_NEG>', '<STARS_LOW>', 'pis.', 'pisdir', 'pisdi']`
-* **FT:** `['pis!', 'pis,', 'pis.', 'pis.pul', 'piis']`
+**Results: Nearest Neighbors (Qualitative)**
 
-**Seed Word: 'bahalı' (expensive)**
-* **W2V:** `['portretlerinə', 'villaları', 'yaxtaları', 'şəbəkədi', 'metallarla']`
-* **FT:** `['bahalıı', 'bahalısı', 'bahalıq', 'baharlı', 'baha,']`
+| Seed Word | W2V Neighbors | FT Neighbors |
+| :--- | :--- | :--- |
+| `yaxşı` | ['iyi', 'yaxshi', '<RATING_POS>', 'yaxwi', 'deməy'] | ['yaxşıı', 'yaxşıkı', 'yaxşıca', 'yaxş', 'yaxşıya'] |
+| `pis` | ['günd', 'vərdişlərə', '<RATING_NEG>', 'xalçalardan', 'kardeşi'] | ['piis', 'pisdii', 'pisə', 'pi', 'pixlr'] |
+| `çox` | ['gözəldir', 'bəyənilsin', 'çöx', 'çoox', 'çoxx'] | ['çoxçox', 'çoxx', 'çoxh', 'ço', 'çoh'] |
+| `bahalı` | ['yaxtaları', 'portretlerinə', 'villaları', 'metallarla', 'kantakt'] | ['bahalıı', 'bahalısı', 'bahalıq', 'baharlı', 'pahalı'] |
+| `ucuz` | ['düzəltdirilib', 'sorbasi', 'şeytanbazardan', 'alinmis', 'keyfiyetli'] | ['ucuzu', 'ucuza', 'ucuzdu', 'ucuzluğa', 'ucuzdur'] |
+| `<RATING_POS>` | ['süper', 'deneyin', 'internetli', 'öyrədici', 'uygulama'] | ['<RATING_NEG>', 'süperr', 'çookk', 'çokk', 'süper'] |
 
----
+**Domain Drift Analysis:**
+We also conducted a domain drift analysis (see Notebook Cell 27) to see if word meanings changed between the "reviews" and "general" domains. We trained separate models on *balanced* samples (5,145 sentences each) and found that words like `telefon` ($0.529$ drift) and `yaxşı` ($0.477$ drift) showed a noticeable change in context, while `film` ($0.264$ drift) remained stable.
 
-## How to Run
+## 6. (Optional) Lemmatization
 
-There are two options to run the full pipeline.
+Lemmatization was not attempted in this assignment.
+
+## 7. Reproducibility
 
 ### Option 1: Google Colab (Recommended)
 
