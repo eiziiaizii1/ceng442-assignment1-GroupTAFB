@@ -143,11 +143,7 @@ We measured cosine similarity for synonym (higher is better) and antonym (lower 
 **Domain Drift Analysis:**
 We also conducted a domain drift analysis (see Notebook Cell 27) to see if word meanings changed between the "reviews" and "general" domains. We trained separate models on *balanced* samples (5,145 sentences each) and found that words like `telefon` ($0.529$ drift) and `yaxşı` ($0.477$ drift) showed a noticeable change in context, while `film` ($0.264$ drift) remained stable.
 
-## 6. (Optional) Lemmatization
-
-Lemmatization was not attempted in this assignment.
-
-## 7. Reproducibility
+## 6. Reproducibility
 
 ### Option 1: Google Colab (Recommended)
 
