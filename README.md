@@ -8,6 +8,8 @@ This project is a pipeline for preprocessing Azerbaijani text data and training 
 * Muhammed Fatih Asan | 23050151026
 * Buğra Bildiren | 20050111022
 
+**Trained Models:**
+* https://drive.google.com/drive/folders/1JDyQ9jVjnsINwnwt0GCWzyrAAb633duM?usp=sharing 
 ---
 
 ## Project Overview
